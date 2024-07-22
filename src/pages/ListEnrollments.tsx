@@ -23,19 +23,21 @@ const ListEnrollments: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
       <Sidebar />
-      <div className="w-3/4 p-8">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">Enrollments</h1>
+      <div className="w-full lg:w-3/4 p-4 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gray-800">
+          Enrollments
+        </h1>
         <ul className="space-y-4">
           {subjectsEnrollments.map((subject) => (
             <li
               key={subject.Id}
-              className="flex justify-between items-center p-4 bg-white shadow rounded-lg"
+              className="flex flex-col sm:flex-row justify-between items-center p-4 bg-white shadow rounded-lg"
             >
               <span className="text-lg text-gray-700">{subject.Name}</span>
               <button
-                className="ml-4 px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600"
+                className="mt-2 sm:mt-0 sm:ml-4 px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600"
                 onClick={() =>
                   deleteEnrollment(
                     enrollments.find(
