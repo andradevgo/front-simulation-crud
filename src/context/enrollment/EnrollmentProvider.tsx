@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useEffect, useReducer } from 'react';
+import { FC, PropsWithChildren, useReducer } from 'react';
 import { EnrollmentContext, EnrollmentReducer } from './';
 import { Enrollment } from '../../interfaces/enrollment';
 import api from '../../api';
