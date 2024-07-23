@@ -33,12 +33,13 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, Photo: string) => {
     dispatch({ type: 'Auth - checking' });
     try {
       const response = await api.post('/auth/signin', {
         Email: email,
         Password: password,
+        Photo : Photo
       });
       const user = response.data;
       const student = await checkStudentByUser(user.Id);
