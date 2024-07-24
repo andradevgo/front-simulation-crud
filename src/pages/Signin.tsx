@@ -1,12 +1,12 @@
-import React, { useContext, useState, useCallback } from 'react';
-import { AuthContext } from '../context/auth';
-import { Link } from 'react-router-dom';
-import Webcam from 'react-webcam';
+import React, { useContext, useState, useCallback } from "react";
+import { AuthContext } from "../context/auth";
+import { Link } from "react-router-dom";
+import Webcam from "react-webcam";
 
 export const Signin: React.FC = () => {
   const { signIn } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [usePhoto, setUsePhoto] = useState(false);
@@ -25,7 +25,7 @@ export const Signin: React.FC = () => {
     []
   );
 
-  const handleCapture = useCallback((dataUri: React.SetStateAction<string | null>) => {
+  const handleCapture = useCallback((dataUri: string | null) => {
     setPhoto(dataUri);
   }, []);
 
@@ -36,9 +36,9 @@ export const Signin: React.FC = () => {
       try {
         if (usePhoto && photo) {
           const base64Photo = photo.replace(/^data:image\/[a-z]+;base64,/, "");
-          await signIn(email, '', base64Photo);
+          await signIn(email, "", base64Photo);
         } else {
-          await signIn(email, password);
+          await signIn(email, password, "");
         }
       } catch (error) {
         setError(
@@ -48,6 +48,17 @@ export const Signin: React.FC = () => {
     },
     [email, password, photo, signIn, usePhoto]
   );
+
+  const webcamRef = React.useRef<Webcam>(null);
+
+  const capturePhoto = useCallback(() => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc) {
+        handleCapture(imageSrc);
+      }
+    }
+  }, [handleCapture]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -108,35 +119,22 @@ export const Signin: React.FC = () => {
               <div className="text-center">
                 <Webcam
                   audio={false}
+                  ref={webcamRef}
                   screenshotFormat="image/jpeg"
                   width={320}
                   height={240}
                   onUserMediaError={() => setError("Error accessing webcam")}
+                />
+                <button
+                  type="button"
+                  className="mt-2 p-2 bg-blue-500 text-white rounded"
+                  onClick={capturePhoto}
                 >
-                  {({ getScreenshot }) => (
-                    <>
-                      <button
-                        type="button"
-                        className="mt-2 p-2 bg-blue-500 text-white rounded"
-                        onClick={() => {
-                          const imageSrc = getScreenshot();
-                          if (imageSrc) {
-                            handleCapture(imageSrc);
-                          }
-                        }}
-                      >
-                        Capturar Foto
-                      </button>
-                      {photo && (
-                        <img
-                          src={photo}
-                          alt="captured"
-                          className="mt-2 rounded"
-                        />
-                      )}
-                    </>
-                  )}
-                </Webcam>
+                  Capturar Foto
+                </button>
+                {photo && (
+                  <img src={photo} alt="captured" className="mt-2 rounded" />
+                )}
               </div>
             )}
           </div>

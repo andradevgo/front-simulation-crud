@@ -15,5 +15,5 @@ export interface SignupFields{
     documentType:string,
     documentNumber:string,
     password:string,
-    Photo:string
+    Photo?:string
 }
