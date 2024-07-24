@@ -7,6 +7,7 @@ import { Home } from '../pages/Home';
 import { ProgramStudent } from '../pages/ProgramStudent';
 import { Profile } from '../pages/Profile';
 import ListEnrollments from '../pages/ListEnrollments';
+import { ClipLoader } from 'react-spinners';
 
 export const AppRouter = () => {
   const { student, status, checkAuthToken } = useContext(AuthContext);
@@ -18,7 +19,14 @@ export const AppRouter = () => {
   }, []);
 
   if (status === 'checking') {
-    return <h3>Cargando...</h3>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="text-center">
+          <ClipLoader color="#4A90E2" size={50} />
+          <p className="mt-4 text-lg text-gray-700">Cargando...</p>
+        </div>
+      </div>
+    );
   }
 
   // if (!student) {

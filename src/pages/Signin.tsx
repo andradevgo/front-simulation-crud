@@ -25,7 +25,7 @@ export const Signin: React.FC = () => {
     []
   );
 
-  const handleCapture = useCallback((dataUri) => {
+  const handleCapture = useCallback((dataUri: React.SetStateAction<string | null>) => {
     setPhoto(dataUri);
   }, []);
 
@@ -35,14 +35,14 @@ export const Signin: React.FC = () => {
       setError(null);
       try {
         if (usePhoto && photo) {
-          const base64Photo = photo.replace(/^data:image\/[a-z]+;base64,/, '');
+          const base64Photo = photo.replace(/^data:image\/[a-z]+;base64,/, "");
           await signIn(email, '', base64Photo);
         } else {
           await signIn(email, password);
         }
       } catch (error) {
         setError(
-          'Failed to sign in. Please check your credentials and try again.'
+          "Failed to sign in. Please check your credentials and try again."
         );
       }
     },
@@ -111,7 +111,7 @@ export const Signin: React.FC = () => {
                   screenshotFormat="image/jpeg"
                   width={320}
                   height={240}
-                  onUserMediaError={() => setError('Error accessing webcam')}
+                  onUserMediaError={() => setError("Error accessing webcam")}
                 >
                   {({ getScreenshot }) => (
                     <>
