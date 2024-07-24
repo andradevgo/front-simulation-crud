@@ -6,7 +6,7 @@ interface ContextProps {
   user: User | null;
   student: number | null;
   checkAuthToken: () => void;
-  signIn: (email: string, password: string) => void;
+  signIn: (email: string, password: string, photo?: string) => void;
   signUp: (signupFields: SignupFields) => void;
   setStudentId: (studentId: number) => void;
   logoutAuth: () => void;

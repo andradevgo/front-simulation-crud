@@ -1,12 +1,15 @@
-import React, { useContext, useState, useCallback } from 'react';
-import { AuthContext } from '../context/auth';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState, useCallback } from "react";
+import { AuthContext } from "../context/auth";
+import { Link } from "react-router-dom";
+import Webcam from "react-webcam";
 
 export const Signin: React.FC = () => {
   const { signIn } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [photo, setPhoto] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [usePhoto, setUsePhoto] = useState(false);
 
   const handleEmailChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,20 +25,40 @@ export const Signin: React.FC = () => {
     []
   );
 
+  const handleCapture = useCallback((dataUri: string | null) => {
+    setPhoto(dataUri);
+  }, []);
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setError(null);
       try {
-        await signIn(email, password);
+        if (usePhoto && photo) {
+          const base64Photo = photo.replace(/^data:image\/[a-z]+;base64,/, "");
+          await signIn(email, "", base64Photo);
+        } else {
+          await signIn(email, password, "");
+        }
       } catch (error) {
         setError(
-          'Failed to sign in. Please check your credentials and try again.'
+          "Failed to sign in. Please check your credentials and try again."
         );
       }
     },
-    [email, password, signIn]
+    [email, password, photo, signIn, usePhoto]
   );
+
+  const webcamRef = React.useRef<Webcam>(null);
+
+  const capturePhoto = useCallback(() => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc) {
+        handleCapture(imageSrc);
+      }
+    }
+  }, [handleCapture]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -70,26 +93,50 @@ export const Signin: React.FC = () => {
                 aria-describedby="email-error"
               />
             </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Ingresa tu password"
-                value={password}
-                onChange={handlePasswordChange}
-                aria-describedby="password-error"
-              />
-            </div>
+            {!usePhoto && (
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Ingresa tu password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  aria-describedby="password-error"
+                />
+              </div>
+            )}
+            {usePhoto && (
+              <div className="text-center">
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  width={320}
+                  height={240}
+                  onUserMediaError={() => setError("Error accessing webcam")}
+                />
+                <button
+                  type="button"
+                  className="mt-2 p-2 bg-blue-500 text-white rounded"
+                  onClick={capturePhoto}
+                >
+                  Capturar Foto
+                </button>
+                {photo && (
+                  <img src={photo} alt="captured" className="mt-2 rounded" />
+                )}
+              </div>
+            )}
           </div>
           {error && (
             <div
@@ -118,6 +165,17 @@ export const Signin: React.FC = () => {
             >
               Regístrate
             </Link>
+          </div>
+          <div className="text-center mt-6">
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                className="form-checkbox"
+                checked={usePhoto}
+                onChange={() => setUsePhoto(!usePhoto)}
+              />
+              <span className="ml-2">Usar foto para iniciar sesión</span>
+            </label>
           </div>
         </form>
       </div>
